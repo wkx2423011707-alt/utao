@@ -21,20 +21,28 @@ jobs:
         cache: gradle
 
     - name: Generate Keystore
-  run: |
-    keytool -genkey -v \
-      -keystore android/x5/keystore/x5.jks \
-      -alias x5 \
-      -keyalg RSA \
-      -keysize 2048 \
-      -validity 10000 \
-      -storepass android123 \
-      -keypass android123 \
-      -dname "CN=Test, OU=Test, O=Test, L=Test, S=Test, C=CN"
+      run: |
+        mkdir -p android/x5/keystore
+        keytool -genkey -v \
+          -keystore android/x5/keystore/x5.jks \
+          -alias x5 \
+          -keyalg RSA \
+          -keysize 2048 \
+          -validity 10000 \
+          -storepass android123 \
+          -keypass android123 \
+          -dname "CN=Test, OU=Test, O=Test, L=Test, S=Test, C=CN"
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       working-directory: android/x5
+
     - name: Build with Gradle
       run: ./gradlew build
       working-directory: android/x5
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release
+        path: android/x5/app/build/outputs/apk/**/*.apk
